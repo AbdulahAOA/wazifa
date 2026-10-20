@@ -1,9 +1,12 @@
+
 import Link from "next/link";
+
+export const instant = false;
 
 function ApplicationsPage() {
   return (
-    <div>
-      <h1>Applications</h1>
+    <div className="flex flex-col items-center justify-center h-screen gap-4">
+      <h1 className="text-4xl font-bold">Applications</h1>
 
       <Link
         className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"

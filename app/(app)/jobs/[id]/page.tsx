@@ -1,3 +1,5 @@
+export const instant = false;
+
 type Props = {
   params: Promise<{
     id: string;
@@ -6,7 +8,6 @@ type Props = {
 
 async function JobDetailsPage({ params }: Props) {
   const { id } = await params;
-  console.log(id);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
@@ -20,6 +21,7 @@ async function JobDetailsPage({ params }: Props) {
           We are looking for a Frontend Engineer with 3 years of experience in
           React, Next.js, and Tailwind CSS.
         </p>
+        <p>Job ID: {id}</p>
       </div>
     </div>
   );

@@ -1,4 +1,7 @@
+
 import Link from "next/link";
+
+export const instant = false;
 
 type Props = {
   params: Promise<{ jobId: string }>;
@@ -6,11 +9,12 @@ type Props = {
 
 async function JobDetailsPage({ params }: Props) {
   const { jobId } = await params;
+
   console.log(jobId);
 
   return (
-    <div>
-      <h1>Job Details</h1>
+    <div className="flex flex-col items-center justify-center h-screen gap-4">
+      <h1 className="text-4xl font-bold">Job Details</h1>
 
       <Link
         className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"

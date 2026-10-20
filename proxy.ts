@@ -3,28 +3,41 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-  const host = (request.headers.get("host") ?? "").toLowerCase();
-  const url = request.nextUrl;
-  const pathname = url.pathname;
+  const host = (request.headers.get("host") ?? "")
+    .toLowerCase()
+    .split(":")[0];
+
+  const pathname = request.nextUrl.pathname;
+
+  // Production admin domain or localhost for testing
+  const isAdminHost =
+    host === "admin.wazifa.app" || host === "localhost";
+
+  const isMainDomain =
+    host === "wazifa.app" || host === "www.wazifa.app";
+
+  const isDashboard =
+    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard/");
 
   console.log("Host:", host);
   console.log("Pathname:", pathname);
 
-  // Rule: Check if admin.wazifa.app, then enter the dashboard
-  const isAdminHost = host.includes("admin.wazifa.app");
-
-  if (isAdminHost && !pathname.startsWith("/dashboard")) {
-    console.log("[IsAdminHost] Redirecting to dashboard");
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Block dashboard on the main domain
+  if (isDashboard && isMainDomain) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Rule: Check if wazifa.app is trying to access /dashboard
-  const isMainDomain =
-    host === "wazifa.app" || host === "www.wazifa.app";
-
-  if (isMainDomain && pathname.startsWith("/dashboard")) {
-    console.log("[IsMainDomain] Redirecting to home");
+  // Block dashboard on any other host except admin and localhost
+  if (isDashboard && !isAdminHost) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Redirect admin domain to dashboard
+  if (host === "admin.wazifa.app" && !isDashboard) {
+    return NextResponse.redirect(
+      new URL("/dashboard", request.url)
+    );
   }
 
   return NextResponse.next();
