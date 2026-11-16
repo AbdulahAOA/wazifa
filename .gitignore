@@ -59,6 +59,7 @@ yarn-error.log*
 *.db-wal
 
 # local editors, caches, and temporary files
+/AGENTS.md
 /.idea/
 /.vscode/
 /.cache/
