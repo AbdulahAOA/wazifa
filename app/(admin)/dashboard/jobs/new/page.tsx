@@ -1,18 +1,28 @@
-import Link from "next/link";
+import { Suspense } from "react";
+import { JobForm } from "@/components/admin/job-form";
+import { getDb } from "@/lib/db/client";
+import { liveRequest } from "@/lib/live";
+import { listCategories } from "@/lib/services/settings";
 
-function NewJobPage() {
+export default function NewJobPage() {
   return (
-    <div>
-      <h1>New Job</h1>
-
-      <Link
-        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-        href="/dashboard/jobs"
-      >
-        Back to Jobs
-      </Link>
-    </div>
+    <Suspense fallback={<p className="font-black">Loading the form…</p>}>
+      <NewJobContent />
+    </Suspense>
   );
 }
 
-export default NewJobPage;
+async function NewJobContent() {
+  await liveRequest();
+  const categories = await listCategories(await getDb());
+
+  return (
+    <div className="grid gap-5">
+      <div>
+        <p className="section-kicker">Create</p>
+        <h1 className="text-4xl font-black">NEW JOB.</h1>
+      </div>
+      <JobForm categories={categories} />
+    </div>
+  );
+}

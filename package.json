@@ -1,22 +1,34 @@
 {
-  "name": "jop-board",
+  "name": "wazifa",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/auth.test.ts tests/jobs.test.ts tests/applications.test.ts tests/home.test.ts tests/search.test.ts tests/candidate-features.test.ts tests/users-admin.test.ts tests/users-admin-details.test.ts tests/security-authz.test.ts",
+    "db:up": "docker compose up -d",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:check": "tsx scripts/check-db.ts",
+    "db:verify": "tsx scripts/verify-persistence.ts",
+    "dev:reset-link": "tsx scripts/dev-password-reset.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@electric-sql/pglite": "^0.5.11",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.0",
+    "drizzle-orm": "^0.45.4",
     "lucide-react": "^1.59.0",
-    "next": "16.4.0",
+    "next": "^16.4.1",
+    "postgres": "^3.4.9",
     "radix-ui": "^1.8.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
     "shadcn": "^4.22.1",
     "tw-animate-css": "^1.4.0"
   },
@@ -26,8 +38,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.4.0",
+    "eslint-config-next": "^16.4.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
+  },
+  "overrides": {
+    "body-parser": "2.4.0",
+    "fast-uri": "3.1.9"
   }
 }

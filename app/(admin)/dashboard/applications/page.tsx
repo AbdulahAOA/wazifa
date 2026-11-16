@@ -1,35 +1,30 @@
+import { Suspense } from "react";
+import { ApplicationsBoard } from "@/components/admin/applications-board";
+import { requireAdmin } from "@/lib/auth/session";
+import { getDb } from "@/lib/db/client";
+import { liveRequest } from "@/lib/live";
+import { listAdminApplications } from "@/lib/services/applications";
 
-import Link from "next/link";
-
-export const instant = false;
-
-function ApplicationsPage() {
+export default function ApplicationsPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
-      <h1 className="text-4xl font-bold">Applications</h1>
-
-      <Link
-        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-        href="/dashboard/applications/new"
-      >
-        Create Application
-      </Link>
-
-      <Link
-        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-        href="/dashboard/applications/123"
-      >
-        View Application
-      </Link>
-
-      <Link
-        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
-        href="/dashboard/applications/123/review"
-      >
-        Review Application
-      </Link>
-    </div>
+    <Suspense fallback={<p className="font-black">Loading the queue…</p>}>
+      <ApplicationsContent />
+    </Suspense>
   );
 }
 
-export default ApplicationsPage;
+async function ApplicationsContent() {
+  await liveRequest();
+  const admin = await requireAdmin();
+  const result = await listAdminApplications(await getDb(), admin, { pageSize: 50 });
+
+  return (
+    <div className="grid gap-5">
+      <div>
+        <p className="section-kicker">Queue</p>
+        <h1 className="text-4xl font-black">APPLICATIONS.</h1>
+      </div>
+      <ApplicationsBoard applications={result.applications} />
+    </div>
+  );
+}

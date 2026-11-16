@@ -1,24 +1,37 @@
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import { ReviewForm } from "@/components/admin/review-form";
+import { requireAdmin } from "@/lib/auth/session";
+import { getDb } from "@/lib/db/client";
+import { liveRequest } from "@/lib/live";
+import { getApplicationForActor } from "@/lib/services/applications";
 
-export const instant = false;
+type Props = { params: Promise<{ applicationId: string }> };
 
-type Props = {
-  params: Promise<{ applicationId: string }>;
-};
-
-async function ApplicationReviewPage({ params }: Props) {
-  const { applicationId } = await params;
-
-  console.log(applicationId);
-
+export default function ApplicationReviewPage({ params }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
-      <h1 className="text-4xl font-bold">Application Review</h1>
-
-      <p className="text-gray-500">
-        Application ID: {applicationId}
-      </p>
-    </div>
+    <Suspense fallback={<p className="font-black">Loading the review…</p>}>
+      <ApplicationReview params={params} />
+    </Suspense>
   );
 }
 
-export default ApplicationReviewPage;
+async function ApplicationReview({ params }: Props) {
+  await liveRequest();
+  const user = await requireAdmin();
+  const { applicationId } = await params;
+  const application = await getApplicationForActor(await getDb(), user, applicationId);
+  if (!application) notFound();
+
+  return (
+    <div className="grid gap-5">
+      <div>
+        <p className="section-kicker">Decision</p>
+        <h1 className="text-4xl font-black">REVIEW {application.candidateName.toUpperCase()}.</h1>
+        <p className="mt-1 font-bold">{application.jobTitle}</p>
+      </div>
+      <div className="border-[3px] border-ink bg-pale p-5 leading-7">{application.coverLetter}</div>
+      <ReviewForm applicationId={application.id} status={application.status} notes={application.notes} />
+    </div>
+  );
+}
